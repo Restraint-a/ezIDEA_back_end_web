@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload and Download</title>
+</head>
+<body>
+    <h1>Upload a .py File</h1>
+    <input type="file" id="fileInput" accept=".txt">
+    <button onclick="uploadFile()">Upload</button>
+    <p id="message"></p>
+
+    <script>
+        function uploadFile() {
+            const input = document.getElementById('fileInput');
+            const message = document.getElementById('message');
+
+            if (input.files && input.files[0]) {
+                const formData = new FormData();
+                formData.append('file', input.files[0]);
+
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // 如果响应是一个文件，直接下载
+                        return response.blob().then(blob => {
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            //a.download = 'processed_' + input.files[0].name;
+                            a.download = 'processed_' + input.files[0].name.replace(/\.py$/, '.txt');
+                            document.body.appendChild(a);
+                            a.click();
+                            a.remove();
+                            window.URL.revokeObjectURL(url);
+                            message.textContent = 'File uploaded and processed successfully.';
+                        });
+                    } else {
+                        return response.json().then(data => {
+                            throw new Error(data.error || 'An error occurred.');
+                        });
+                    }
+                })
+                .catch(error => {
+                    message.textContent = `Error: ${error.message}`;
+                });
+            } else {
+                message.textContent = 'Please select a file to upload.';
+            }
+        }
+    </script>
+</body>
+</html>
