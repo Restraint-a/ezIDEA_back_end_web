@@ -6,33 +6,36 @@
     <title>File Upload and Download</title>
 </head>
 <body>
-    <h1>Upload a .py File</h1>
-    <input type="file" id="fileInput" accept=".txt">
-    <button onclick="uploadFile()">Upload</button>
-    <p id="message"></p>
+<h1>Upload a .py File</h1>
+<input type="file" id="fileInput" accept=".py">
+<button onclick="uploadFile()">Upload</button>
+<p id="message"></p>
 
-    <script>
-        function uploadFile() {
-            const input = document.getElementById('fileInput');
-            const message = document.getElementById('message');
+<script>
+    function uploadFile() {
+        const input = document.getElementById('fileInput');
+        const message = document.getElementById('message');
 
-            if (input.files && input.files[0]) {
-                const formData = new FormData();
-                formData.append('file', input.files[0]);
+        if (input.files && input.files[0]) {
+            const formData = new FormData();
+            formData.append('file', input.files[0]);
 
-                fetch('/upload', {
-                    method: 'POST',
-                    body: formData
-                })
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
                 .then(response => {
                     if (response.ok) {
+                        const fileName = response.headers.get('Content-Disposition').split('filename=')[1];
+
                         // 如果响应是一个文件，直接下载
                         return response.blob().then(blob => {
                             const url = window.URL.createObjectURL(blob);
                             const a = document.createElement('a');
                             a.href = url;
                             //a.download = 'processed_' + input.files[0].name;
-                            a.download = 'processed_' + input.files[0].name.replace(/\.py$/, '.txt');
+                            //a.download = 'processed_' + input.files[0].name.replace(/\.py$/, '.txt');
+                            a.download = decodeURIComponent(fileName); // 使用实际文件名
                             document.body.appendChild(a);
                             a.click();
                             a.remove();
@@ -48,10 +51,10 @@
                 .catch(error => {
                     message.textContent = `Error: ${error.message}`;
                 });
-            } else {
-                message.textContent = 'Please select a file to upload.';
-            }
+        } else {
+            message.textContent = 'Please select a file to upload.';
         }
-    </script>
+    }
+</script>
 </body>
 </html>

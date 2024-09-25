@@ -23,19 +23,7 @@ def index():
 def upload_file():
     """
     处理文件上传请求
-    ---
-    description: 上传文件并处理，然后返回处理后的文件
-    parameters:
-      - name: file
-        in: formData
-        description: The file to upload
-        required: true
-        type: file
-    responses:
-      200:
-        description: Processed file is returned for download
-      400:
-        description: Bad request due to missing file, no selected file, or file type not allowed
+
     """
     # 检查请求中是否有文件部分
     if 'file' not in request.files:
@@ -55,11 +43,12 @@ def upload_file():
 
         process_file_out(filename)
 
-        result_filename = f"{os.path.splitext(filename)[0]}_result.txt"
-        process_report(filename)
+        #result_filename = f"{os.path.splitext(filename)[0]}_result.txt"
+        file_json = process_report(filename)
         #print(result_filename)
         # 返回处理后的文件供下载
-        return send_file(result_filename, as_attachment=True,attachment_filename=result_filename)
+        #return send_file(result_filename, as_attachment=True,attachment_filename=result_filename)
+        return send_file(file_json, as_attachment=True)
     else:
         # 文件类型不允许
         return jsonify({'error': 'File type not allowed'}), 400
