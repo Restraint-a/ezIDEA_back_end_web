@@ -1,6 +1,7 @@
 from flask import Flask, request, send_file, jsonify, render_template
 import os
 from pylint_process import process_file_out, process_report
+from improve_code import read_result,is_want,improve,improve_code
 
 app = Flask(__name__)
 
@@ -62,6 +63,31 @@ def allowed_file(filename):
     # 使用rsplit函数，从右向左分割一次（但分割后的列表仍是左向右排序）
     return '.' in filename and filename.rsplit('.', 1)[1].lower() == 'py'
 
+@app.route('/improve', methods=['POST'])
+def improve_code_endpoint():
+    """
+    处理代码优化请求
+    """
+    # 获取前端传递的文件名
+    data = request.get_json()
+    if 'filename' not in data:
+        return jsonify({'error': 'Filename not provided'}), 400
+
+    filename = data['filename']
+    filepath = os.path.join(UPLOAD_FOLDER, filename)
+
+    # 生成改进后的文件
+    try:
+        improved_filename = improve_code(filepath)
+        # 读取改进后的文件内容
+        # with open(improved_filename, 'r') as f:
+        #     improved_data = json.load(f)
+        #
+        # return jsonify(improved_data)
+        # 使用send_file发送文件
+        return send_file(improved_filename, as_attachment=True)
+    except FileNotFoundError as e:
+        return jsonify({'error': str(e)}), 400
 
 if __name__ == '__main__':
     # 启动Flask应用，调试模式设为True

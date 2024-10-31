@@ -9,12 +9,16 @@
 <h1>Upload a .py File</h1>
 <input type="file" id="fileInput" accept=".py">
 <button onclick="uploadFile()">Upload</button>
+<button id="optimizeButton" onclick="optimizeCode()" disabled>Optimize</button>
 <p id="message"></p>
 
 <script>
+    let uploadedFileName = '';
+
     function uploadFile() {
         const input = document.getElementById('fileInput');
         const message = document.getElementById('message');
+        const optimizeButton = document.getElementById('optimizeButton');
 
         if (input.files && input.files[0]) {
             const formData = new FormData();
@@ -33,14 +37,15 @@
                             const url = window.URL.createObjectURL(blob);
                             const a = document.createElement('a');
                             a.href = url;
-                            //a.download = 'processed_' + input.files[0].name;
-                            //a.download = 'processed_' + input.files[0].name.replace(/\.py$/, '.txt');
                             a.download = decodeURIComponent(fileName); // 使用实际文件名
                             document.body.appendChild(a);
                             a.click();
                             a.remove();
                             window.URL.revokeObjectURL(url);
+
                             message.textContent = 'File uploaded and processed successfully.';
+                            uploadedFileName = input.files[0].name; // 保存上传的文件名
+                            optimizeButton.disabled = false; // 启用优化按钮
                         });
                     } else {
                         return response.json().then(data => {
@@ -54,6 +59,42 @@
         } else {
             message.textContent = 'Please select a file to upload.';
         }
+    }
+
+    function optimizeCode() {
+        const message = document.getElementById('message');
+
+        fetch('/improve', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ filename: uploadedFileName })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json().then(data => {
+                        // 将优化后的 JSON 数据转换为 Blob 并下载
+                        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `${uploadedFileName.split('.')[0]}_improved.json`;
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        window.URL.revokeObjectURL(url);
+                        message.textContent = 'Code optimized successfully.';
+                    });
+                } else {
+                    return response.json().then(data => {
+                        throw new Error(data.error || 'An error occurred.');
+                    });
+                }
+            })
+            .catch(error => {
+                message.textContent = `Error: ${error.message}`;
+            });
     }
 </script>
 </body>

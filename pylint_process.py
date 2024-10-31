@@ -28,9 +28,9 @@ def parse_pylint_rate(output):
 
         # 将评分信息组装成字典并添加到列表中
         rates.append({
-            '当前分数': current_score,
-            '上次分数': previous_score,
-            '变化': change
+            'current_score': current_score,
+            'previous_score': previous_score,
+            'change': change
         })
         return rates
     else:
@@ -62,13 +62,14 @@ def parse_pylint_output(output):
         match = re.match(pattern, line.strip())
         if match:
             filename, line_num, col_num, error_code, message = match.groups()
-            results.append({
-                '文件名': filename,
-                '出错行': int(line_num),
-                '出错列': int(col_num),
-                '错误码': error_code,
-                '错误信息': message
-            })
+            if not (error_code.startswith('C') or error_code.startswith('W')):
+                results.append({
+                    'file_name': filename,
+                    'error_line': int(line_num),
+                    'error_col': int(col_num),
+                    'error_code': error_code,
+                    'error_message': message
+                })
 
     return results
 
@@ -109,6 +110,6 @@ def process_report(filename):
 
     #将解析后的结果和评分情况保存为json文件
     with open(result_filename, 'w', encoding='utf-8') as f:
-        json.dump({'错误信息': parsed_results, '评分情况': parsed_rates}, f, ensure_ascii=False, indent=4)
+        json.dump({'Error(s)': parsed_results, 'Score(s)': parsed_rates}, f, ensure_ascii=False, indent=4)
 
     return result_filename

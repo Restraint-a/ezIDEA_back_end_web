@@ -1,32 +1,18 @@
 {
-    "错误信息": [
+    "Error(s)": [
         {
-            "文件名": "test.py",
-            "出错行": 2,
-            "出错列": 0,
-            "错误码": "C0304",
-            "错误信息": "Final newline missing"
-        },
-        {
-            "文件名": "test.py",
-            "出错行": 1,
-            "出错列": 0,
-            "错误码": "C0114",
-            "错误信息": "Missing module docstring"
-        },
-        {
-            "文件名": "test.py",
-            "出错行": 1,
-            "出错列": 0,
-            "错误码": "C0103",
-            "错误信息": "Constant name \"a\" doesn't conform to UPPER_CASE naming style"
+            "file_name": "test.py",
+            "error_line": 2,
+            "error_col": 15,
+            "error_code": "E0602",
+            "error_message": "Undefined variable '__main__'"
         }
     ],
-    "评分情况": [
+    "Score(s)": [
         {
-            "当前分数": "0.00",
-            "上次分数": "0.00",
-            "变化": "+0.00"
+            "current_score": "0.00",
+            "previous_score": "0.00",
+            "change": "+0.00"
         }
     ]
 }
