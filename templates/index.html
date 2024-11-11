@@ -13,8 +13,6 @@
 <p id="message"></p>
 
 <script>
-    let uploadedFileName = '';
-
     function uploadFile() {
         const input = document.getElementById('fileInput');
         const message = document.getElementById('message');
@@ -44,7 +42,6 @@
                             window.URL.revokeObjectURL(url);
 
                             message.textContent = 'File uploaded and processed successfully.';
-                            uploadedFileName = input.files[0].name; // 保存上传的文件名
                             optimizeButton.disabled = false; // 启用优化按钮
                         });
                     } else {
@@ -65,21 +62,15 @@
         const message = document.getElementById('message');
 
         fetch('/improve', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ filename: uploadedFileName })
+            method: 'POST'
         })
             .then(response => {
                 if (response.ok) {
-                    return response.json().then(data => {
-                        // 将优化后的 JSON 数据转换为 Blob 并下载
-                        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    return response.blob().then(blob => {
                         const url = window.URL.createObjectURL(blob);
                         const a = document.createElement('a');
                         a.href = url;
-                        a.download = `${uploadedFileName.split('.')[0]}_improved.json`;
+                        a.download = 'improved_code.py'; // 默认下载文件名为 improved_code.py
                         document.body.appendChild(a);
                         a.click();
                         a.remove();

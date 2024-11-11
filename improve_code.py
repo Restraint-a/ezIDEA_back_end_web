@@ -28,7 +28,7 @@ def is_want(disc):
                    如果不存在，返回 -1。
     """
     # 预定义的错误消息列表
-    error_msg = ["Undefined variable '__main__'", ]
+    error_msg = ["Undefined variable '__main__'","No name 'a' in module 'json'","Method 'foo' has no argument","Method 'bar' should have \"self\" as first argument" ]
     try:
         # 尝试获取给定错误信息在预定义错误消息列表中的索引位置。
         index = error_msg.index(disc['error_message'])
@@ -54,7 +54,7 @@ def improve(result, improved_name):
     """
     # 初始化改进后的错误列表和对应的改进代码列表
     improved = []
-    improved_code = ["if __name__ == '__main__':",]
+    improved_code = ["if __name__ == '__main__':","import json","    def foo(self):","    def bar(self,a):"]
 
     # 遍历分析结果中的错误信息
     for error in result['Error(s)']:
